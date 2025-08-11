@@ -1,6 +1,6 @@
 /**
  * ===============================================================================
- * 🍽️ MODERN MINIMALIST RESTAURANT TEMPLATE - COMPLETE STYLESHEET
+ * 🍽️ MODERN MINIMALIST RESTAURANT TEMPLATE - COMPLETE STYLESHEET (FIXED)
  * ===============================================================================
  * 
  * 🎨 DESIGN PHILOSOPHY: "Sophisticated Simplicity"
@@ -10,18 +10,10 @@
  * • Focus on premium imagery and content
  * • Subtle, refined animations and interactions
  * 
- * 📱 RESPONSIVE APPROACH:
- * • Desktop-first with elegant mobile adaptations
- * • Maintains sophistication across all devices
- * • Typography scales gracefully
- * • Navigation adapts without losing elegance
- * 
- * 💎 PREMIUM FEATURES:
- * • Advanced CSS Grid and Flexbox layouts
- * • Custom properties for easy brand customization
- * • Smooth micro-interactions and hover states
- * • Professional imagery integration
- * • Modern glassmorphism and backdrop effects
+ * 🔧 FIXES APPLIED:
+ * • Hero text visibility improved
+ * • Gallery display fixed
+ * • Better contrast for readability
  * 
  * ===============================================================================
  */
@@ -222,13 +214,13 @@ p {
 
 .btn-secondary {
   background: transparent;
-  color: var(--primary-color);
-  border-color: var(--primary-color);
+  color: var(--neutral-color);
+  border-color: var(--neutral-color);
 }
 
 .btn-secondary:hover {
-  background: var(--primary-color);
-  color: var(--neutral-color);
+  background: var(--neutral-color);
+  color: var(--primary-color);
   transform: translateY(-2px);
 }
 
@@ -374,7 +366,7 @@ p {
 }
 
 /* ==========================================================================
-   HERO SECTION
+   HERO SECTION - FIXED TEXT VISIBILITY
    ========================================================================== */
 .hero {
   min-height: 100vh;
@@ -397,7 +389,7 @@ p {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.7);
+  filter: brightness(0.6); /* Darker image for better text contrast */
 }
 
 .hero-overlay {
@@ -406,14 +398,18 @@ p {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.4));
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 26, 0.8), 
+    rgba(26, 26, 26, 0.6),
+    rgba(212, 175, 55, 0.1)
+  );
   z-index: -1;
 }
 
 .hero-content {
   position: relative;
   z-index: 1;
-  color: var(--neutral-color);
+  color: var(--neutral-color); /* Force white text */
   padding: var(--spacing-xxxl) 0;
   width: 100%;
 }
@@ -435,6 +431,8 @@ p {
   font-weight: 600;
   letter-spacing: 4px;
   margin-bottom: 0.5rem;
+  color: var(--neutral-color) !important; /* Force white */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important; /* Strong text shadow */
 }
 
 .title-sub {
@@ -444,7 +442,8 @@ p {
   font-weight: 300;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: var(--accent-color);
+  color: var(--accent-color) !important; /* Force gold color */
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8) !important;
 }
 
 .hero-subtitle {
@@ -452,7 +451,8 @@ p {
   font-weight: 400;
   line-height: 1.6;
   margin-bottom: var(--spacing-xl);
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95) !important; /* Force white with opacity */
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
 }
 
 .hero-buttons {
@@ -471,10 +471,10 @@ p {
 }
 
 .info-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   text-align: center;
@@ -482,7 +482,7 @@ p {
 }
 
 .info-card:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(-5px);
 }
 
@@ -503,14 +503,16 @@ p {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent-color);
+  color: var(--accent-color) !important;
   font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) !important;
 }
 
 .info-value {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--neutral-color);
+  color: var(--neutral-color) !important; /* Force white */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) !important;
 }
 
 /* ==========================================================================
@@ -926,7 +928,7 @@ p {
 }
 
 /* ==========================================================================
-   GALLERY SECTION
+   GALLERY SECTION - FIXED DISPLAY
    ========================================================================== */
 .gallery {
   padding: var(--section-padding);
@@ -934,10 +936,14 @@ p {
 }
 
 .gallery-grid {
-  display: grid;
+  display: grid !important;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 200px);
   gap: var(--spacing-md);
+  width: 100%;
+  height: auto;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .gallery-item {
@@ -945,6 +951,9 @@ p {
   overflow: hidden;
   position: relative;
   transition: var(--transition-smooth);
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .gallery-item.large {
@@ -962,6 +971,7 @@ p {
   height: 100%;
   object-fit: cover;
   transition: var(--transition-smooth);
+  display: block !important;
 }
 
 .gallery-item:hover img {
@@ -1429,13 +1439,13 @@ p {
   }
   
   .gallery-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(4, 180px);
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: repeat(4, 180px) !important;
   }
   
   .gallery-item.large {
-    grid-column: span 2;
-    grid-row: span 2;
+    grid-column: span 2 !important;
+    grid-row: span 2 !important;
   }
 }
 
@@ -1565,13 +1575,13 @@ p {
   
   /* Gallery */
   .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(6, 150px);
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(6, 150px) !important;
   }
   
   .gallery-item.large {
-    grid-column: span 2;
-    grid-row: span 2;
+    grid-column: span 2 !important;
+    grid-row: span 2 !important;
   }
   
   /* Testimonials */
@@ -1625,13 +1635,13 @@ p {
   }
   
   .gallery-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, 200px);
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(6, 200px) !important;
   }
   
   .gallery-item.large {
-    grid-column: span 1;
-    grid-row: span 1;
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
   }
 }
 
