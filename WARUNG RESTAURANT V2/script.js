@@ -1,18 +1,20 @@
 /**
  * ===============================================================================
- * 🍽️ MODERN MINIMALIST RESTAURANT - INTERACTIVE FUNCTIONALITY
+ * 🍽️ MODERN MINIMALIST RESTAURANT TEMPLATE - COMPLETE JAVASCRIPT
  * ===============================================================================
  * 
- * 🏗️ ARCHITECTURE: Component-Based (Flutter-like structure)
- * • Modular components for easy maintenance
- * • Clean separation of concerns
- * • Performance-optimized interactions
+ * 🎨 FEATURES:
+ * • Auto-population from config.js
+ * • Sophisticated navigation system
+ * • Interactive reservation system
+ * • WhatsApp integration
+ * • Smooth animations and transitions
+ * • Mobile-responsive interactions
  * 
- * 📱 FEATURES:
- * • Responsive navigation with smooth animations
- * • Dynamic content loading from config
- * • WhatsApp reservation system
- * • Modern UI interactions
+ * 📝 CUSTOMIZATION:
+ * • All customization through RESTAURANT_CONFIG in config.js
+ * • Clean, modular JavaScript architecture
+ * • Modern ES6+ features
  * 
  * ===============================================================================
  */
@@ -20,34 +22,13 @@
 // ==========================================================================
 // 🛠️ UTILITY FUNCTIONS
 // ==========================================================================
-class Utils {
-  static $(selector) { return document.querySelector(selector); }
-  static $$(selector) { return document.querySelectorAll(selector); }
-  
-  static formatCurrency(amount, currency = 'IDR') {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0
-    }).format(amount);
-  }
-  
-  static debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-  
-  static smoothScroll(target, offset = 80) {
-    const element = Utils.$(target);
-    if (!element) return;
-    
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
+
+// Smooth scroll with offset for fixed navigation
+const smoothScroll = (target, offset = 100) => {
+  const element = $(target);
+  if (element) {
     const elementPosition = element.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - offset;
     
@@ -56,189 +37,235 @@ class Utils {
       behavior: 'smooth'
     });
   }
-  
-  static createWhatsAppUrl(phone, message) {
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+};
+
+// Debounce function for performance optimization
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+// Format Indonesian currency
+const formatIDR = (amount) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(amount);
+};
+
+// Validate configuration
+const validateConfig = () => {
+  if (typeof window.RESTAURANT_CONFIG === 'undefined') {
+    console.error('❌ RESTAURANT_CONFIG not found! Make sure config.js is loaded first.');
+    return false;
   }
-}
+  return window.validateConfig ? window.validateConfig() : true;
+};
 
 // ==========================================================================
-// 🎨 TEMPLATE CUSTOMIZER COMPONENT
+// 🎨 TEMPLATE CUSTOMIZER CLASS
 // ==========================================================================
-class TemplateCustomizer {
-  constructor(config) {
-    this.config = config;
-    this.init();
-  }
-  
-  init() {
+class ModernTemplateCustomizer {
+  constructor() {
+    this.config = window.RESTAURANT_CONFIG;
     if (!this.config) {
       console.error('❌ RESTAURANT_CONFIG not found!');
       return;
     }
-    
-    this.updateMetadata();
-    this.updateBranding();
-    this.updateContent();
+    this.init();
+  }
+  
+  init() {
+    this.updateColors();
+    this.updateRestaurantInfo();
+    this.updateMetaTags();
     this.updateImages();
     this.updateContactInfo();
-    this.populateFeatures();
-    this.populateExperiences(); 
-    this.updateNavigation();
+    this.updateFeatures();
+    this.updateSpecialExperiences();
+    this.updateMenuTabs();
+    this.updateSocialLinks();
+    this.updateGoogleMaps();
   }
   
-  updateMetadata() {
-    const { website, restaurantInfo } = this.config;
-    
-    // Update page title
-    if (website?.title) {
-      document.title = website.title;
-    }
-    
-    // Update meta tags
-    const metaDesc = Utils.$('meta[name="description"]');
-    if (metaDesc && website?.description) {
-      metaDesc.content = website.description;
-    }
-    
-    const metaKeywords = Utils.$('meta[name="keywords"]');
-    if (metaKeywords && website?.keywords) {
-      metaKeywords.content = website.keywords;
-    }
-    
-    // Update Open Graph
-    const ogTitle = Utils.$('meta[property="og:title"]');
-    const ogDesc = Utils.$('meta[property="og:description"]');
-    const ogImage = Utils.$('meta[property="og:image"]');
-    
-    if (ogTitle) ogTitle.content = website?.title || restaurantInfo?.name;
-    if (ogDesc) ogDesc.content = website?.description;
-    if (ogImage && website?.ogImage) ogImage.content = website.ogImage;
-  }
-  
-  updateBranding() {
-    const { colors } = this.config.branding;
+  // Update CSS custom properties from config
+  updateColors() {
     const root = document.documentElement;
+    const colors = this.config.branding?.colors;
     
     if (colors) {
       root.style.setProperty('--primary-color', colors.primary);
       root.style.setProperty('--secondary-color', colors.secondary);
       root.style.setProperty('--accent-color', colors.accent);
       root.style.setProperty('--neutral-color', colors.neutral);
+      root.style.setProperty('--text-primary', colors.textPrimary);
+      root.style.setProperty('--text-secondary', colors.textSecondary);
     }
   }
   
-  updateContent() {
-    const { restaurantInfo } = this.config;
+  // Update restaurant information throughout the site
+  updateRestaurantInfo() {
+    const info = this.config.restaurantInfo;
+    if (!info) return;
     
     // Update restaurant name
-    Utils.$$('.logo-text, .footer-logo-text, .footer-business-name').forEach(el => {
-      el.textContent = restaurantInfo.name;
+    $$('.logo-text, .footer-logo-text, .footer-business-name').forEach(el => {
+      el.textContent = info.name || 'LOADING';
     });
     
     // Update hero content
-    const titleMain = Utils.$('.title-main');
-    const titleSub = Utils.$('.title-sub'); 
+    const titleMain = $('.title-main');
+    const titleSub = $('.title-sub');
+    if (titleMain) titleMain.textContent = info.name || 'LOADING';
+    if (titleSub) titleSub.textContent = info.tagline || 'Contemporary Dining';
     
-    if (titleMain) titleMain.textContent = restaurantInfo.name;
-    if (titleSub) titleSub.textContent = restaurantInfo.tagline;
-    
-    // Update hero description
-    const heroSubtitle = Utils.$('.hero-subtitle');
-    if (heroSubtitle) heroSubtitle.textContent = restaurantInfo.description;
+    const heroSubtitle = $('.hero-subtitle');
+    if (heroSubtitle) heroSubtitle.textContent = info.description;
     
     // Update about section
-    const aboutDescription = Utils.$('.about-description');
-    if (aboutDescription) aboutDescription.textContent = restaurantInfo.description;
+    const aboutDescription = $('.about-description');
+    if (aboutDescription) aboutDescription.textContent = info.story;
     
-    const aboutPhilosophy = Utils.$('.about-philosophy');
-    if (aboutPhilosophy) aboutPhilosophy.textContent = `"${restaurantInfo.philosophy}"`;
+    const aboutPhilosophy = $('.about-philosophy');
+    if (aboutPhilosophy) aboutPhilosophy.textContent = info.philosophy;
     
-    // Update chef info
-    const chefName = Utils.$('.chef-name');
-    const chefTitle = Utils.$('.chef-title');
-    const chefBio = Utils.$('.chef-bio');
+    // Update chef information
+    const chefName = $('.chef-name');
+    const chefTitle = $('.chef-title');
+    if (chefName) chefName.textContent = info.chefName || 'Loading Chef Name';
+    if (chefTitle) chefTitle.textContent = info.chefTitle || 'Executive Chef & Owner';
     
-    if (chefName) chefName.textContent = restaurantInfo.chefName;
-    if (chefTitle) chefTitle.textContent = restaurantInfo.chefTitle;
-    if (chefBio) chefBio.textContent = restaurantInfo.chefBio;
-    
-    // Update highlights
-    const highlights = Utils.$$('.highlight-number');
-    if (highlights.length >= 3) {
-      highlights[0].textContent = restaurantInfo.established;
-      highlights[1].textContent = restaurantInfo.rating;
-      highlights[2].textContent = restaurantInfo.capacity;
-    }
+    // Update highlights/stats
+    const establishedEl = $$('.highlight-number')[0];
+    const capacityEl = $$('.highlight-number')[2];
+    if (establishedEl) establishedEl.textContent = info.yearEstablished || '2019';
+    if (capacityEl) capacityEl.textContent = info.capacity || '45';
   }
   
-  updateImages() {
-    const { images } = this.config.branding;
+  // Update meta tags for SEO
+  updateMetaTags() {
+    const website = this.config.website;
+    const restaurantInfo = this.config.restaurantInfo;
     
-    // Update logos
-    Utils.$$('.logo, .footer-logo img').forEach(img => {
-      if (images.logo) img.src = images.logo;
-    });
+    if (website?.title) document.title = website.title;
+    if (restaurantInfo?.name) {
+      document.title = document.title.replace('Modern Restaurant Template', restaurantInfo.name);
+    }
+    
+    // Update meta description
+    const metaDescription = $('meta[name="description"]');
+    if (metaDescription && website?.description) {
+      metaDescription.content = website.description;
+    }
+    
+    // Update meta keywords
+    const metaKeywords = $('meta[name="keywords"]');
+    if (metaKeywords && website?.keywords) {
+      metaKeywords.content = website.keywords;
+    }
+    
+    // Update Open Graph tags
+    const ogTitle = $('meta[property="og:title"]');
+    const ogDescription = $('meta[property="og:description"]');
+    const ogImage = $('meta[property="og:image"]');
+    
+    if (ogTitle && website?.title) ogTitle.content = website.title;
+    if (ogDescription && website?.description) ogDescription.content = website.description;
+    if (ogImage && website?.ogImage) ogImage.content = website.ogImage;
+  }
+  
+  // Update images from config
+  updateImages() {
+    const images = this.config.branding?.images;
+    if (!images) return;
+    
+    // Update logo
+    if (images.logo) {
+      $$('.logo, .footer-logo img').forEach(img => {
+        img.src = images.logo;
+        img.alt = `${this.config.restaurantInfo?.name} Logo`;
+      });
+    }
     
     // Update hero background
-    const heroImg = Utils.$('.hero-img');
+    const heroImg = $('.hero-img');
     if (heroImg && images.heroBackground) {
       heroImg.src = images.heroBackground;
+      heroImg.alt = 'Restaurant Interior';
     }
     
     // Update chef photo
-    const chefImage = Utils.$('.chef-image');
-    if (chefImage && images.chefPhoto) {
-      chefImage.src = images.chefPhoto;
+    const chefImg = $('.chef-image');
+    if (chefImg && images.chefPhoto) {
+      chefImg.src = images.chefPhoto;
+      chefImg.alt = this.config.restaurantInfo?.chefName || 'Executive Chef';
     }
     
     // Update favicon
-    const favicon = Utils.$('link[rel="icon"]');
+    const favicon = $('link[rel="icon"]');
+    const appleTouchIcon = $('link[rel="apple-touch-icon"]');
     if (favicon && images.favicon) favicon.href = images.favicon;
+    if (appleTouchIcon && images.favicon) appleTouchIcon.href = images.favicon;
   }
   
+  // Update contact information
   updateContactInfo() {
-    const { contact } = this.config;
+    const contact = this.config.contact;
+    if (!contact) return;
     
-    // Update hero info cards - fix selector
-    const infoValues = Utils.$('.info-value');
-    if (infoValues.length >= 3) {
-      infoValues[0].textContent = `${contact.address.area}, ${contact.address.city}`;
-      infoValues[1].textContent = `${contact.hours.restaurant.days}, ${contact.hours.restaurant.open}-${contact.hours.restaurant.close}`;
-      infoValues[2].textContent = contact.phone;
+    // Update hero info cards
+    const infoCards = $$('.info-card');
+    if (infoCards.length >= 3) {
+      // Location card
+      const locationValue = infoCards[0].querySelector('.info-value');
+      if (locationValue) locationValue.textContent = `${contact.area}, ${contact.city}`;
+      
+      // Hours card  
+      const hoursValue = infoCards[1].querySelector('.info-value');
+      if (hoursValue) hoursValue.textContent = `${contact.hours?.days}, ${contact.hours?.open}-${contact.hours?.close}`;
+      
+      // Phone card
+      const phoneValue = infoCards[2].querySelector('.info-value');
+      if (phoneValue) phoneValue.textContent = contact.phone;
     }
     
-    // Also update via alternative selector if needed
-    const locationValue = Utils.$('.info-card:nth-child(1) .info-value');
-    const hoursValue = Utils.$('.info-card:nth-child(2) .info-value');
-    const phoneValue = Utils.$('.info-card:nth-child(3) .info-value');
-    
-    if (locationValue) locationValue.textContent = `${contact.address.area}, ${contact.address.city}`;
-    if (hoursValue) hoursValue.textContent = `${contact.hours.restaurant.days}, ${contact.hours.restaurant.open}-${contact.hours.restaurant.close}`;
-    if (phoneValue) phoneValue.textContent = contact.phone;
-    
-    // Populate contact details
-    this.populateContactDetails();
-    
     // Update WhatsApp links
-    this.updateWhatsAppLinks();
+    const reservationMessage = `Halo ${this.config.restaurantInfo?.name || 'Aurora'}, saya ingin melakukan reservasi meja.`;
+    const whatsappUrl = `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(reservationMessage)}`;
     
-    // Update social media
-    this.updateSocialMedia();
+    $$('a[href*="wa.me"], .whatsapp-float, .cta-nav').forEach(link => {
+      if (link.href.includes('wa.me') || link.classList.contains('whatsapp-float') || link.classList.contains('cta-nav')) {
+        link.href = whatsappUrl;
+      }
+    });
+    
+    // Populate contact details section
+    this.populateContactDetails();
   }
   
+  // Populate detailed contact information
   populateContactDetails() {
-    const { contact } = this.config;
-    const contactDetails = Utils.$('#contact-details');
+    const contact = this.config.contact;
+    const contactDetails = $('#contact-details');
     
-    if (!contactDetails) return;
+    if (!contact || !contactDetails) return;
+    
+    const fullAddress = `${contact.address}, ${contact.area}, ${contact.city} ${contact.postalCode}`;
     
     contactDetails.innerHTML = `
       <div class="contact-item">
         <div class="contact-icon">📍</div>
         <div class="contact-text">
           <h3>Location</h3>
-          <p>${contact.address.street}<br>${contact.address.area}, ${contact.address.city} ${contact.address.postalCode}<br><em>${contact.address.landmark}</em></p>
+          <p>${fullAddress}<br><em>${contact.landmark || ''}</em></p>
         </div>
       </div>
       
@@ -247,8 +274,8 @@ class TemplateCustomizer {
         <div class="contact-text">
           <h3>Reservations</h3>
           <p>
-            <a href="tel:${contact.phone}">${contact.phone}</a><br>
-            <a href="${Utils.createWhatsAppUrl(contact.whatsapp, 'Hello, I would like to make a reservation')}" target="_blank">WhatsApp: +${contact.whatsapp}</a>
+            <a href="tel:+${contact.phone.replace(/\D/g, '')}">${contact.phone}</a><br>
+            <a href="https://wa.me/${contact.whatsapp}" target="_blank">WhatsApp: +${contact.whatsapp}</a>
           </p>
         </div>
       </div>
@@ -256,11 +283,11 @@ class TemplateCustomizer {
       <div class="contact-item">
         <div class="contact-icon">⏰</div>
         <div class="contact-text">
-          <h3>Hours</h3>
+          <h3>Opening Hours</h3>
           <p>
-            <strong>Dining:</strong> ${contact.hours.restaurant.days}<br>
-            ${contact.hours.restaurant.open} - ${contact.hours.restaurant.close}<br>
-            <em>Closed ${contact.hours.restaurant.closed}</em>
+            ${contact.hours?.days || 'Tuesday - Sunday'}: ${contact.hours?.open} - ${contact.hours?.close}<br>
+            <em>Closed ${contact.hours?.closedDay || 'Monday'}</em><br>
+            Reservations: ${contact.hours?.reservationHours || '09:00 - 22:00'}
           </p>
         </div>
       </div>
@@ -268,157 +295,121 @@ class TemplateCustomizer {
       <div class="contact-item">
         <div class="contact-icon">✉️</div>
         <div class="contact-text">
-          <h3>Email</h3>
-          <p><a href="mailto:${contact.email}">${contact.email}</a></p>
+          <h3>Email & Web</h3>
+          <p>
+            <a href="mailto:${contact.email}">${contact.email}</a><br>
+            <a href="https://${contact.website}" target="_blank">${contact.website}</a>
+          </p>
         </div>
       </div>
     `;
-  }
-  
-  updateWhatsAppLinks() {
-    const { contact, restaurantInfo } = this.config;
-    const message = `Hello ${restaurantInfo.name}, I would like to make a reservation`;
-    const whatsappUrl = Utils.createWhatsAppUrl(contact.whatsapp, message);
     
-    Utils.$$('a[href="#"], .cta-nav, #whatsapp-float').forEach(link => {
-      if (link.textContent.toLowerCase().includes('reserve') || 
-          link.id === 'whatsapp-float' ||
-          link.classList.contains('cta-nav')) {
-        link.href = whatsappUrl;
-        link.target = '_blank';
-      }
-    });
+    // Update footer contact
+    const footerContact = $('#footer-contact');
+    if (footerContact) {
+      footerContact.innerHTML = `
+        <p>📍 ${fullAddress}</p>
+        <p>📞 <a href="tel:+${contact.phone.replace(/\D/g, '')}">${contact.phone}</a></p>
+        <p>💬 <a href="https://wa.me/${contact.whatsapp}" target="_blank">WhatsApp</a></p>
+        <p>🕐 ${contact.hours?.days}: ${contact.hours?.open} - ${contact.hours?.close}</p>
+      `;
+    }
   }
   
-  updateSocialMedia() {
-    const { socialMedia } = this.config.contact;
-    const socialContainer = Utils.$('#social-links');
-    const footerSocial = Utils.$('#footer-social');
+  // Update restaurant features section
+  updateFeatures() {
+    const highlights = this.config.highlights;
+    const featuresGrid = $('#features-grid');
+    
+    if (!highlights || !featuresGrid) return;
+    
+    featuresGrid.innerHTML = highlights.map(highlight => `
+      <div class="feature-card">
+        <div class="feature-icon">${highlight.icon}</div>
+        <h3 class="feature-title">${highlight.title}</h3>
+        <p class="feature-description">${highlight.description}</p>
+      </div>
+    `).join('');
+  }
+  
+  // Update special experiences section
+  updateSpecialExperiences() {
+    const experiences = this.config.specialExperiences;
+    const experiencesGrid = $('#experiences-grid');
+    
+    if (!experiences || !experiencesGrid) return;
+    
+    experiencesGrid.innerHTML = experiences.filter(exp => exp.active).map(experience => `
+      <div class="experience-card">
+        <div class="experience-badge">${experience.badge}</div>
+        <h3 class="experience-title">${experience.title}</h3>
+        <p class="experience-description">${experience.description}</p>
+        <div class="experience-price">${experience.price}</div>
+        <p class="experience-availability">${experience.availability}</p>
+      </div>
+    `).join('');
+  }
+  
+  // Update menu tabs
+  updateMenuTabs() {
+    const categories = this.config.menuCategories;
+    const menuTabsContainer = $('#menu-tabs');
+    
+    if (!categories || !menuTabsContainer) return;
+    
+    menuTabsContainer.innerHTML = categories.map((category, index) => `
+      <button class="tab-btn ${index === 0 ? 'active' : ''}" data-tab="${category.id}">
+        ${category.icon ? category.icon + ' ' : ''}${category.name}
+      </button>
+    `).join('');
+  }
+  
+  // Update social media links
+  updateSocialLinks() {
+    const socialMedia = this.config.contact?.socialMedia;
+    const socialLinksContainer = $('#social-links');
+    const footerSocial = $('#footer-social');
     
     if (!socialMedia) return;
     
-    const socialHTML = `
-      ${socialMedia.instagram ? `<a href="https://instagram.com/${socialMedia.instagram}" target="_blank" class="social-link">📸</a>` : ''}
-      ${socialMedia.facebook ? `<a href="https://facebook.com/${socialMedia.facebook}" target="_blank" class="social-link">📘</a>` : ''}
-      ${socialMedia.tiktok ? `<a href="https://tiktok.com/@${socialMedia.tiktok}" target="_blank" class="social-link">🎵</a>` : ''}
-    `;
-    
-    if (socialContainer) socialContainer.innerHTML = socialHTML;
-    if (footerSocial) footerSocial.innerHTML = socialHTML;
-  }
-  
-  populateFeatures() {
-    const featuresGrid = Utils.$('#features-grid');
-    if (!featuresGrid || !this.config.features) return;
-    
-    featuresGrid.innerHTML = this.config.features.map(feature => `
-      <div class="feature-card">
-        <div class="feature-icon">${feature.icon}</div>
-        <h3 class="feature-title">${feature.title}</h3>
-        <p class="feature-description">${feature.description}</p>
-      </div>
-    `).join('');
-  }
-  
-  populateExperiences() {
-    const experiencesGrid = Utils.$('#experiences-grid');
-    if (!experiencesGrid || !this.config.specialExperiences) return;
-    
-    experiencesGrid.innerHTML = this.config.specialExperiences.map(exp => `
-      <div class="experience-card ${exp.featured ? 'featured' : ''}">
-        ${exp.badge ? `<div class="experience-badge">${exp.badge}</div>` : ''}
-        <h3 class="experience-title">${exp.title}</h3>
-        <p class="experience-description">${exp.description}</p>
-        <div class="experience-price">${exp.price}</div>
-        <p class="experience-availability">${exp.availability}</p>
-      </div>
-    `).join('');
-  }
-  
-  updateNavigation() {
-    // Update menu tabs
-    const menuTabs = Utils.$('#menu-tabs');
-    if (menuTabs && this.config.menuCategories) {
-      menuTabs.innerHTML = this.config.menuCategories.map((cat, index) => `
-        <button class="tab-btn ${index === 0 ? 'active' : ''}" data-tab="${cat.id}">
-          ${cat.icon} ${cat.name}
-        </button>
-      `).join('');
+    const socialLinks = [];
+    if (socialMedia.instagram) {
+      socialLinks.push(`<a href="https://instagram.com/${socialMedia.instagram}" target="_blank" class="social-link" aria-label="Instagram">📸</a>`);
+    }
+    if (socialMedia.facebook) {
+      socialLinks.push(`<a href="https://facebook.com/${socialMedia.facebook}" target="_blank" class="social-link" aria-label="Facebook">📘</a>`);
+    }
+    if (socialMedia.tiktok) {
+      socialLinks.push(`<a href="https://tiktok.com/@${socialMedia.tiktok}" target="_blank" class="social-link" aria-label="TikTok">🎵</a>`);
+    }
+    if (this.config.contact?.whatsapp) {
+      socialLinks.push(`<a href="https://wa.me/${this.config.contact.whatsapp}" target="_blank" class="social-link" aria-label="WhatsApp">💬</a>`);
     }
     
-    // Update Google Maps
-    const googleMaps = Utils.$('#google-maps');
-    if (googleMaps && this.config.website?.googleMapsUrl) {
-      googleMaps.src = this.config.website.googleMapsUrl;
-    }
-    
-    // Fix gallery display
-    this.fixGalleryDisplay();
+    if (socialLinksContainer) socialLinksContainer.innerHTML = socialLinks.join('');
+    if (footerSocial) footerSocial.innerHTML = socialLinks.join('');
   }
   
-  fixGalleryDisplay() {
-    // Ensure gallery grid is visible and properly styled
-    const galleryGrid = Utils.$('.gallery-grid');
-    if (galleryGrid) {
-      // Force gallery visibility
-      galleryGrid.style.display = 'grid';
-      galleryGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-      galleryGrid.style.gridTemplateRows = 'repeat(3, 200px)';
-      galleryGrid.style.gap = 'var(--spacing-md)';
-      galleryGrid.style.width = '100%';
-      galleryGrid.style.height = 'auto';
-      galleryGrid.style.visibility = 'visible';
-      galleryGrid.style.opacity = '1';
-      
-      // Make sure gallery items are visible
-      const galleryItems = galleryGrid.querySelectorAll('.gallery-item');
-      galleryItems.forEach((item, index) => {
-        item.style.display = 'block';
-        item.style.opacity = '1';
-        item.style.visibility = 'visible';
-        item.style.position = 'relative';
-        
-        // Ensure images load properly
-        const img = item.querySelector('img');
-        if (img) {
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
-          img.style.display = 'block';
-          
-          // Force reload image if not loaded
-          if (!img.complete) {
-            const src = img.src;
-            img.src = '';
-            img.src = src;
-          }
-        }
-      });
-      
-      // Also ensure gallery section is visible
-      const gallerySection = Utils.$('#gallery');
-      if (gallerySection) {
-        gallerySection.style.display = 'block';
-        gallerySection.style.visibility = 'visible';
-        gallerySection.style.opacity = '1';
-      }
-      
-      console.log(`✅ Gallery fixed: ${galleryItems.length} items visible`);
-    } else {
-      console.warn('Gallery grid not found');
+  // Update Google Maps
+  updateGoogleMaps() {
+    const googleMapsUrl = this.config.website?.googleMapsEmbedUrl;
+    const mapIframe = $('#google-maps');
+    
+    if (googleMapsUrl && mapIframe) {
+      mapIframe.src = googleMapsUrl;
     }
   }
 }
 
 // ==========================================================================
-// 🧭 NAVIGATION COMPONENT
+// 📱 NAVIGATION SYSTEM
 // ==========================================================================
-class Navigation {
+class ModernNavigation {
   constructor() {
-    this.navbar = Utils.$('#navbar');
-    this.hamburger = Utils.$('#hamburger');
-    this.navMenu = Utils.$('#nav-menu');
-    this.navLinks = Utils.$$('.nav-link');
+    this.navbar = $('#navbar');
+    this.hamburger = $('#hamburger');
+    this.navMenu = $('#nav-menu');
+    this.navLinks = $$('.nav-link');
     this.isMenuOpen = false;
     
     this.init();
@@ -428,22 +419,30 @@ class Navigation {
     this.setupHamburgerToggle();
     this.setupNavLinks();
     this.setupScrollEffect();
-    this.setupActiveLinks();
+    this.setupActiveLink();
   }
   
   setupHamburgerToggle() {
     this.hamburger?.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       this.toggleMobileMenu();
     });
     
-    // Close on outside click
+    // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-      if (this.isMenuOpen && 
-          !this.navMenu.contains(e.target) && 
-          !this.hamburger.contains(e.target)) {
+      if (this.isMenuOpen && !this.navMenu.contains(e.target) && !this.hamburger.contains(e.target)) {
         this.closeMobileMenu();
       }
+    });
+    
+    // Close menu on navigation link click
+    this.navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (this.isMenuOpen) {
+          this.closeMobileMenu();
+        }
+      });
     });
   }
   
@@ -453,7 +452,11 @@ class Navigation {
     this.navMenu.classList.toggle('active');
     
     // Prevent body scroll
-    document.body.style.overflow = this.isMenuOpen ? 'hidden' : '';
+    if (this.isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
   }
   
   closeMobileMenu() {
@@ -468,9 +471,10 @@ class Navigation {
       link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
         
+        // Handle internal navigation
         if (href && href.startsWith('#') && href !== '#') {
           e.preventDefault();
-          Utils.smoothScroll(href);
+          smoothScroll(href);
           this.closeMobileMenu();
         }
       });
@@ -478,7 +482,7 @@ class Navigation {
   }
   
   setupScrollEffect() {
-    const handleScroll = Utils.debounce(() => {
+    const handleScroll = debounce(() => {
       if (window.scrollY > 100) {
         this.navbar.classList.add('scrolled');
       } else {
@@ -489,9 +493,9 @@ class Navigation {
     window.addEventListener('scroll', handleScroll);
   }
   
-  setupActiveLinks() {
-    const handleScroll = Utils.debounce(() => {
-      const sections = Utils.$$('section[id]');
+  setupActiveLink() {
+    const handleScroll = debounce(() => {
+      const sections = $$('section[id]');
       const scrollPos = window.scrollY + 150;
       
       sections.forEach(section => {
@@ -515,12 +519,12 @@ class Navigation {
 }
 
 // ==========================================================================
-// 🍽️ MENU COMPONENT
+// 🍽️ MENU SYSTEM
 // ==========================================================================
-class MenuTabs {
+class MenuSystem {
   constructor() {
-    this.tabButtons = Utils.$$('.tab-btn');
-    this.tabContents = Utils.$$('.menu-content');
+    this.tabButtons = $$('.tab-btn');
+    this.tabContents = $$('.menu-content');
     
     this.init();
   }
@@ -535,15 +539,17 @@ class MenuTabs {
   }
   
   switchTab(targetTab, clickedButton) {
-    // Remove active classes
+    // Remove active class from all tabs and contents
     this.tabButtons.forEach(btn => btn.classList.remove('active'));
     this.tabContents.forEach(content => content.classList.remove('active'));
     
-    // Add active classes
+    // Add active class to clicked tab and corresponding content
     clickedButton.classList.add('active');
-    const targetContent = Utils.$(`#${targetTab}`);
+    const targetContent = $(`#${targetTab}`);
     if (targetContent) {
       targetContent.classList.add('active');
+      
+      // Animate menu items
       this.animateMenuItems(targetContent);
     }
   }
@@ -552,10 +558,10 @@ class MenuTabs {
     const menuItems = container.querySelectorAll('.menu-item');
     menuItems.forEach((item, index) => {
       item.style.opacity = '0';
-      item.style.transform = 'translateY(20px)';
+      item.style.transform = 'translateY(30px)';
       
       setTimeout(() => {
-        item.style.transition = 'all 0.3s ease';
+        item.style.transition = 'all 0.4s ease';
         item.style.opacity = '1';
         item.style.transform = 'translateY(0)';
       }, index * 100);
@@ -564,28 +570,43 @@ class MenuTabs {
 }
 
 // ==========================================================================
-// 📝 RESERVATION FORM COMPONENT
+// 📅 RESERVATION SYSTEM
 // ==========================================================================
-class ReservationForm {
-  constructor(config) {
-    this.form = Utils.$('#reservation-form');
-    this.config = config;
-    
+class ReservationSystem {
+  constructor() {
+    this.form = $('#reservation-form');
+    this.config = window.RESTAURANT_CONFIG;
     this.init();
   }
   
   init() {
     if (!this.form) return;
     
+    this.setupDateValidation();
     this.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.handleSubmit(e);
+      this.handleReservation(e);
     });
   }
   
-  async handleSubmit(e) {
+  setupDateValidation() {
+    const dateInput = this.form.querySelector('input[type="date"]');
+    if (!dateInput) return;
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    
+    // Set maximum date based on advance booking setting
+    const advanceDays = this.config?.dining?.reservations?.advanceBooking || 30;
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + advanceDays);
+    dateInput.max = maxDate.toISOString().split('T')[0];
+  }
+  
+  async handleReservation(e) {
     const formData = new FormData(this.form);
-    const data = {
+    const reservationData = {
       name: formData.get('name'),
       phone: formData.get('phone'),
       date: formData.get('date'),
@@ -596,67 +617,86 @@ class ReservationForm {
     };
     
     // Validate required fields
-    if (!data.name || !data.phone || !data.date || !data.time || !data.guests) {
+    if (!reservationData.name || !reservationData.phone || !reservationData.date || 
+        !reservationData.time || !reservationData.guests) {
       this.showMessage('Please fill in all required fields', 'error');
       return;
     }
     
+    // Show loading state
     const submitBtn = this.form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Processing...';
+    submitBtn.disabled = true;
     
     try {
-      submitBtn.textContent = 'Sending...';
-      submitBtn.disabled = true;
+      // Format reservation message for WhatsApp
+      const restaurantName = this.config?.restaurantInfo?.name || 'Aurora';
+      const whatsappMessage = this.formatReservationMessage(reservationData, restaurantName);
       
-      // Create WhatsApp message
-      const restaurantName = this.config.restaurantInfo.name;
-      const message = this.createReservationMessage(data, restaurantName);
-      
-      // Open WhatsApp
-      const whatsappUrl = Utils.createWhatsAppUrl(this.config.contact.whatsapp, message);
+      // Send to WhatsApp
+      const whatsappNumber = this.config?.contact?.whatsapp || '628123456789';
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
       window.open(whatsappUrl, '_blank');
       
-      this.showMessage('Reservation request sent via WhatsApp. We\'ll confirm within 2 hours!', 'success');
+      this.showMessage('Reservation request sent! We\'ll confirm via WhatsApp within 2 hours.', 'success');
       this.form.reset();
       
     } catch (error) {
-      this.showMessage('Something went wrong. Please try again.', 'error');
+      this.showMessage('Error processing reservation. Please try again.', 'error');
     } finally {
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
     }
   }
   
-  createReservationMessage(data, restaurantName) {
-    return `🍽️ *RESERVATION REQUEST - ${restaurantName}*
-
-👤 *Guest Details:*
-Name: ${data.name}
-Phone: ${data.phone}
-
-📅 *Reservation Details:*
-Date: ${data.date}
-Time: ${data.time}
-Guests: ${data.guests}
-${data.occasion ? `Occasion: ${data.occasion}` : ''}
-
-${data.requests ? `💬 *Special Requests:*
-${data.requests}` : ''}
-
-Please confirm availability. Thank you! 🙏`;
+  formatReservationMessage(data, restaurantName) {
+    const formatDate = (dateStr) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    };
+    
+    let message = `*RESERVATION REQUEST - ${restaurantName}*\n\n`;
+    message += `*Guest Details:*\n`;
+    message += `• Name: ${data.name}\n`;
+    message += `• Phone: ${data.phone}\n\n`;
+    message += `*Reservation Details:*\n`;
+    message += `• Date: ${formatDate(data.date)}\n`;
+    message += `• Time: ${data.time}\n`;
+    message += `• Party Size: ${data.guests} ${data.guests === '1' ? 'guest' : 'guests'}\n`;
+    
+    if (data.occasion) {
+      message += `• Occasion: ${data.occasion}\n`;
+    }
+    
+    if (data.requests) {
+      message += `\n*Special Requests:*\n${data.requests}\n`;
+    }
+    
+    message += `\nPlease confirm availability. Thank you! 🍽️`;
+    
+    return message;
   }
   
   showMessage(message, type) {
+    // Remove existing message
     const existingMessage = this.form.querySelector('.form-message');
     if (existingMessage) existingMessage.remove();
     
+    // Create new message
     const messageEl = document.createElement('div');
     messageEl.className = 'form-message';
     messageEl.style.cssText = `
-      padding: 12px 16px;
+      padding: 16px 20px;
       border-radius: 8px;
-      margin-top: 15px;
+      margin-top: 20px;
       font-weight: 500;
+      text-align: center;
       ${type === 'success' 
         ? 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;' 
         : 'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'
@@ -666,12 +706,13 @@ Please confirm availability. Thank you! 🙏`;
     
     this.form.appendChild(messageEl);
     
+    // Remove after 5 seconds
     setTimeout(() => messageEl.remove(), 5000);
   }
 }
 
 // ==========================================================================
-// ⚡ PERFORMANCE ENHANCEMENTS
+// ⚡ PERFORMANCE & UX ENHANCEMENTS
 // ==========================================================================
 class PerformanceEnhancements {
   constructor() {
@@ -682,10 +723,11 @@ class PerformanceEnhancements {
     this.setupLazyLoading();
     this.setupIntersectionObserver();
     this.setupImageOptimization();
+    this.setupScrollToTop();
   }
   
   setupLazyLoading() {
-    const lazyImages = Utils.$$('img[loading="lazy"]');
+    const lazyImages = $$('img[loading="lazy"]');
     
     if ('IntersectionObserver' in window) {
       const imageObserver = new IntersectionObserver((entries) => {
@@ -703,9 +745,14 @@ class PerformanceEnhancements {
   }
   
   setupIntersectionObserver() {
-    const animatedElements = Utils.$$('.feature-card, .testimonial-card, .experience-card, .menu-item');
+    const animatedElements = $$('.feature-card, .experience-card, .menu-item, .testimonial-card');
     
-    if ('IntersectionObserver' in window) {
+    if ('IntersectionObserver' in window && window.RESTAURANT_CONFIG?.features?.enableAnimations) {
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+      
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -713,7 +760,7 @@ class PerformanceEnhancements {
             observer.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      }, observerOptions);
       
       animatedElements.forEach(el => {
         el.style.animationPlayState = 'paused';
@@ -723,7 +770,7 @@ class PerformanceEnhancements {
   }
   
   setupImageOptimization() {
-    Utils.$$('img').forEach(img => {
+    $$('img').forEach(img => {
       if (!img.complete) {
         img.style.opacity = '0';
         img.addEventListener('load', () => {
@@ -733,200 +780,200 @@ class PerformanceEnhancements {
       }
     });
   }
+  
+  setupScrollToTop() {
+    const scrollBtn = document.createElement('button');
+    scrollBtn.innerHTML = '↑';
+    scrollBtn.setAttribute('aria-label', 'Scroll to top');
+    scrollBtn.style.cssText = `
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border: none;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: var(--neutral-color);
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--shadow-medium);
+    `;
+    
+    document.body.appendChild(scrollBtn);
+    
+    // Show/hide based on scroll
+    window.addEventListener('scroll', debounce(() => {
+      if (window.scrollY > 600) {
+        scrollBtn.style.opacity = '1';
+        scrollBtn.style.visibility = 'visible';
+      } else {
+        scrollBtn.style.opacity = '0';
+        scrollBtn.style.visibility = 'hidden';
+      }
+    }, 100));
+    
+    // Scroll to top on click
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 }
 
 // ==========================================================================
-// 🏗️ MAIN APPLICATION CLASS
+// 📊 SECTION VISIBILITY MANAGER
 // ==========================================================================
-class ModernRestaurant {
+class SectionManager {
   constructor() {
-    this.config = window.RESTAURANT_CONFIG;
-    this.components = [];
-    
+    this.features = window.RESTAURANT_CONFIG?.features || {};
     this.init();
   }
   
   init() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.initializeApp());
-    } else {
-      this.initializeApp();
+    this.toggleSections();
+    this.updateNavigation();
+  }
+  
+  toggleSections() {
+    if (!this.features.showAbout) this.hideSection('#about');
+    if (!this.features.showFeatures) this.hideSection('.features');
+    if (!this.features.showExperiences) this.hideSection('#experiences');
+    if (!this.features.showGallery) this.hideSection('#gallery');
+    if (!this.features.showTestimonials) this.hideSection('.testimonials');
+    
+    if (!this.features.enableReservations) {
+      const reservationForm = $('.reservation-form');
+      if (reservationForm) reservationForm.style.display = 'none';
     }
   }
   
-  initializeApp() {
-    if (!this.config) {
-      console.error('❌ RESTAURANT_CONFIG not found! Make sure config.js is loaded first.');
-      return;
-    }
-    
-    try {
-      // Initialize template customization
-      this.customizer = new TemplateCustomizer(this.config);
-      
-      // Initialize components
-      this.components.push(new Navigation());
-      this.components.push(new MenuTabs());
-      this.components.push(new ReservationForm(this.config));
-      this.components.push(new PerformanceEnhancements());
-      
-      // Fix common display issues immediately
-      this.fixCommonIssues();
-      
-      // Additional fixes after DOM is fully loaded
-      setTimeout(() => {
-        this.customizer.fixGalleryDisplay();
-        this.fixHeroTextVisibility();
-      }, 500);
-      
-      // Set current year
-      const yearElement = Utils.$('#current-year');
-      if (yearElement) yearElement.textContent = new Date().getFullYear();
-      
-      console.log(`🍽️ ${this.config.restaurantInfo.name} - Modern Restaurant Template Loaded Successfully!`);
-      console.log('📝 Configuration can be customized in config.js');
-      console.log('🔧 Template components initialized:', this.components.length);
-      
-      // Debug gallery display
-      setTimeout(() => {
-        const galleryItems = Utils.$('.gallery-item');
-        console.log(`🖼️ Gallery items found: ${galleryItems.length}`);
-        if (galleryItems.length === 0) {
-          console.warn('⚠️ No gallery items found - this may be a display issue');
-        }
-      }, 1000);
-      
-    } catch (error) {
-      console.error('❌ Error initializing Modern Restaurant Template:', error);
-    }
+  hideSection(selector) {
+    const section = $(selector);
+    if (section) section.style.display = 'none';
   }
   
-  fixCommonIssues() {
-    // Remove any unwanted circular elements
-    const unwantedElements = Utils.$('.circular-element, .broken-circle');
-    unwantedElements.forEach(el => el.remove());
+  updateNavigation() {
+    const hiddenSections = [];
     
-    // Ensure footer contact is populated
-    this.populateFooterContact();
+    if (!this.features.showAbout) hiddenSections.push('about');
+    if (!this.features.showGallery) hiddenSections.push('gallery');
     
-    // Fix any empty sections
-    this.fixEmptySections();
-  }
-  
-  populateFooterContact() {
-    const { contact } = this.config;
-    const footerContact = Utils.$('#footer-contact');
-    
-    if (footerContact) {
-      footerContact.innerHTML = `
-        <p>📍 ${contact.address.street}, ${contact.address.city}</p>
-        <p>📞 <a href="tel:${contact.phone}">${contact.phone}</a></p>
-        <p>💬 <a href="${Utils.createWhatsAppUrl(contact.whatsapp, 'Hello!')}" target="_blank">+${contact.whatsapp}</a></p>
-        <p>⏰ ${contact.hours.restaurant.days}: ${contact.hours.restaurant.open}-${contact.hours.restaurant.close}</p>
-      `;
-    }
-  }
-  
-  fixEmptySections() {
-    // Ensure all sections have minimum content
-    const sections = Utils.$('section');
-    sections.forEach(section => {
-      if (section.textContent.trim().length < 10) {
-        console.warn(`Section ${section.id} appears to be empty`);
+    hiddenSections.forEach(section => {
+      const navItem = $(`.nav-link[href="#${section}"]`);
+      if (navItem?.parentElement) {
+        navItem.parentElement.style.display = 'none';
       }
     });
   }
 }
 
 // ==========================================================================
-// 🚀 INITIALIZE APPLICATION
+// 🚀 MAIN APPLICATION CLASS
 // ==========================================================================
-const modernRestaurant = new ModernRestaurant();
+class ModernRestaurantApp {
+  constructor() {
+    this.components = [];
+    this.init();
+  }
+  
+  init() {
+    // Wait for DOM and config to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.initializeComponents());
+    } else {
+      this.initializeComponents();
+    }
+  }
+  
+  initializeComponents() {
+    // Validate configuration
+    if (!validateConfig()) {
+      console.error('❌ App initialization failed due to configuration errors');
+      return;
+    }
+    
+    try {
+      // Initialize core systems
+      this.customizer = new ModernTemplateCustomizer();
+      this.sectionManager = new SectionManager();
+      
+      // Initialize all components
+      this.components.push(new ModernNavigation());
+      this.components.push(new MenuSystem());
+      this.components.push(new ReservationSystem());
+      this.components.push(new PerformanceEnhancements());
+      
+      // Store global references
+      window.templateCustomizer = this.customizer;
+      
+      console.log('🍽️ Modern Restaurant Template initialized successfully!');
+      console.log('💡 Type showCustomizationHelp() for quick customization tips');
+      
+    } catch (error) {
+      console.error('❌ Error initializing Modern Restaurant Template:', error);
+    }
+  }
+}
 
 // ==========================================================================
-// 🌟 GLOBAL HELPER FUNCTIONS
+// 🌟 GLOBAL QUICK FUNCTIONS
 // ==========================================================================
-window.modernRestaurantHelp = () => {
-  console.log(`
-🍽️ Modern Restaurant Template - Quick Help
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📝 CUSTOMIZATION:
-• Edit RESTAURANT_CONFIG in config.js
-• All content, colors, and contact info controlled there
-• No need to edit HTML or CSS files
-
-🔧 QUICK COMMANDS:
-• updateRestaurantName('New Name')
-• updateContactInfo('+62...', '628...', 'email@...')
-• updateBrandColors('#color1', '#color2', '#color3')
-• validateRestaurantConfig()
-
-💡 TIPS:
-• Use high-quality images (min 1920px width for hero)
-• Test WhatsApp integration thoroughly
-• Keep content concise and elegant
-
-📱 MOBILE-FIRST DESIGN:
-• Responsive across all devices
-• Touch-friendly interactions
-• Optimized loading performance
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  `);
+window.changeColorScheme = function(scheme) {
+  if (window.RESTAURANT_CONFIG && window.RESTAURANT_CONFIG.changeColorScheme) {
+    window.RESTAURANT_CONFIG.changeColorScheme(scheme);
+  }
 };
 
-// Show help message after load
+window.changeRestaurantName = function(name) {
+  if (window.RESTAURANT_CONFIG && window.RESTAURANT_CONFIG.changeRestaurantName) {
+    window.RESTAURANT_CONFIG.changeRestaurantName(name);
+  }
+};
+
+window.updateContact = function(contactData) {
+  if (window.RESTAURANT_CONFIG && window.RESTAURANT_CONFIG.updateContact) {
+    window.RESTAURANT_CONFIG.updateContact(contactData);
+  }
+};
+
+// ==========================================================================
+// ⚡ START THE APPLICATION
+// ==========================================================================
+const modernRestaurantApp = new ModernRestaurantApp();
+
+// Show welcome message after everything loads
 window.addEventListener('load', () => {
   setTimeout(() => {
     if (window.RESTAURANT_CONFIG) {
       console.log(`
-🎉 Welcome to ${window.RESTAURANT_CONFIG.restaurantInfo.name}!
+🍽️ ${window.RESTAURANT_CONFIG.restaurantInfo?.name || 'Modern Restaurant'} - Template Ready!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💡 Type modernRestaurantHelp() for customization guide
-📝 Edit config.js to customize your restaurant
-🚀 Upload all files to your hosting to go live
+✅ Sophisticated template loaded successfully!
 
-🔧 Quick Debug Commands:
-• fixGalleryNow() - Force fix gallery display
-• fixHeroNow() - Force fix hero text visibility
+📝 QUICK CUSTOMIZATION:
+1. Edit RESTAURANT_CONFIG in config.js
+2. Update restaurant info, colors, contact details
+3. Save and refresh to see changes
+
+💡 CONSOLE COMMANDS:
+• changeColorScheme('dark' | 'light' | 'elegant')
+• changeRestaurantName('Your Restaurant Name')
+• updateContact({phone: '021-xxx-xxxx', whatsapp: '628xxxxxxxxx'})
+
+🎨 DESIGN READY FOR:
+• Fine dining restaurants
+• Modern cafes & bistros
+• Contemporary cuisine
+• Upscale dining experiences
+
+Perfect for sophisticated dining establishments! 🌟
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       `);
     }
-  }, 1500);
+  }, 1200);
 });
-
-// Quick fix functions for debugging
-window.fixGalleryNow = () => {
-  const galleryGrid = Utils.$('.gallery-grid');
-  if (galleryGrid) {
-    galleryGrid.style.display = 'grid !important';
-    galleryGrid.style.visibility = 'visible !important';
-    galleryGrid.style.opacity = '1 !important';
-    
-    const items = galleryGrid.querySelectorAll('.gallery-item');
-    items.forEach(item => {
-      item.style.display = 'block !important';
-      item.style.visibility = 'visible !important';
-      item.style.opacity = '1 !important';
-    });
-    
-    console.log(`✅ Gallery force-fixed: ${items.length} items`);
-  }
-};
-
-window.fixHeroNow = () => {
-  const titleMain = Utils.$('.title-main');
-  const titleSub = Utils.$('.title-sub');
-  
-  if (titleMain) {
-    titleMain.style.color = '#FFFFFF !important';
-    titleMain.style.textShadow = '2px 2px 8px rgba(0, 0, 0, 0.8) !important';
-  }
-  
-  if (titleSub) {
-    titleSub.style.color = '#D4AF37 !important';
-    titleSub.style.textShadow = '1px 1px 4px rgba(0, 0, 0, 0.8) !important';
-  }
-  
-  console.log('✅ Hero text force-fixed');
-};
